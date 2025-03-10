@@ -1,0 +1,53 @@
+<?php
+require 'vendor/autoload.php';
+
+use Facebook\WebDriver\Chrome\ChromeDriver;
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverKeys;
+
+// Path to your ChromeDrivera
+$chromeDriverPath = '/path/to/chromedriver';
+
+// Set up Chrome options
+$options = new ChromeOptions();
+$options->addArguments(['--disable-gpu', '--no-sandbox']);
+
+// Set up desired capabilities
+$capabilities = DesiredCapabilities::chrome();
+$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
+
+// Start the WebDriver
+$driver = ChromeDriver::start($capabilities, $chromeDriverPath);
+
+// Open WhatsApp Web
+$driver->get('https://web.whatsapp.com');
+
+// Wait for the user to scan the QR code manually
+echo "Scan the QR code to log in.\n";
+sleep(15); // Adjust sleep time as needed
+
+// Input phone number and message
+$phoneNumber = '+1234567890'; // Replace with the recipient's phone number
+$message = 'Hello, this is a test message!'; // Replace with your message
+
+// Locate the search box and input the phone number
+$searchBox = $driver->findElement(WebDriverBy::xpath('//div[@contenteditable="true"][@data-tab="3"]'));
+$searchBox->click();
+$searchBox->sendKeys($phoneNumber);
+sleep(2);
+$searchBox->sendKeys(WebDriverKeys::ENTER);
+
+// Locate the message input box and send the message
+$messageBox = $driver->findElement(WebDriverBy::xpath('//div[@contenteditable="true"][@data-tab="10"]'));
+$messageBox->click();
+$messageBox->sendKeys($message);
+$messageBox->sendKeys(WebDriverKeys::ENTER);
+
+echo "Message sent successfully!\n";
+
+// Close the browser
+sleep(5); // Wait for the message to be sent
+$driver->quit();
+?>
